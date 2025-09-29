@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RuaTatto</title>
+
+  <!-- SEO -->
+  <meta name="description" content="RuaTattoo | Fine line & black&grey dövmeler. Randevu ve fiyat için WhatsApp üzerinden iletişime geçin. İstanbul.">
+  <link rel="canonical" href="https://ruatatto.com">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="RuaTattoo | Sanat, teninle buluştuğunda">
+  <meta property="og:description" content="Fine line & black&grey dövme çalışmaları. Randevu için WhatsApp.">
+  <meta property="og:url" content="https://ruatatto.com">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://ruatatto.com/big13.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico">
+  <meta name="theme-color" content="#0a0a0a">
+
+  <style>
+    :root{
+      --bg:#0a0a0a;          /* siyah arka plan */
+      --text:#ffffff;        /* beyaz metin */
+      --accent:#8b5cf6;      /* mor vurgu (violet-500) */
+      --accent-2:#a78bfa;    /* açık mor */
+      --card:#121212;        /* kart zemin */
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+
+    /* Skip link (erişilebilirlik) */
+    .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+    .skip-link:focus{left:16px;top:16px;width:auto;height:auto;z-index:50;background:#111;border:1px solid var(--accent);color:var(--text);padding:8px 10px;border-radius:10px}
+
+    /* Header */
+    header{position:sticky;top:0;z-index:40;background:rgba(10,10,10,.8);backdrop-filter:saturate(160%) blur(6px);border-bottom:1px solid #1f1f1f}
+    .nav{max-width:1200px;margin:auto;display:flex;align-items:center;gap:18px;padding:10px 16px}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text)}
+    .brand img{height:40px;width:auto}
+    .brand span{font-weight:700;letter-spacing:.6px}
+
+    nav{margin-left:auto;display:flex;flex-wrap:wrap;gap:8px}
+    nav a{color:var(--text);text-decoration:none;padding:8px 12px;border-radius:999px;border:1px solid transparent}
+    nav a:hover{border-color:var(--accent);color:var(--accent)}
+    nav a.active{color:var(--accent);border-color:var(--accent)}
+    nav a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+    /* Menü butonu */
+    .menu-btn{display:none;margin-left:auto;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:10px;padding:8px 12px;cursor:pointer}
+    .menu-btn:hover{background:rgba(139,92,246,.1)}
+
+    /* Hero */
+    .hero{max-width:1200px;margin:24px auto 0;display:grid;grid-template-columns:1.2fr .8fr;gap:24px;padding:0 16px 32px}
+    .hero-card{
+      background:var(--card);border:1px solid #222;border-radius:16px;overflow:hidden;
+      position:relative;min-height:420px;box-shadow:0 8px 20px rgba(0,0,0,.3)
+    }
+    .hero-card img{
+      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+      /* odak için gerekirse: object-position:50% 30%; */
+    }
+    .hero-copy{display:flex;flex-direction:column;justify-content:center;padding:24px}
+    .kicker{color:var(--accent-2);text-transform:uppercase;font-weight:700;font-size:.8rem;letter-spacing:.14em}
+    h1{margin:.4rem 0 0;font-size:clamp(28px,4vw,40px);line-height:1.15}
+    .pill{display:inline-block;margin-left:8px;padding:3px 10px;border-radius:999px;background:rgba(139,92,246,.15);color:var(--accent)}
+    .cta{margin-top:18px;display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#0b0210;border:none;padding:10px 14px;border-radius:12px;font-weight:700;text-decoration:none;box-shadow:0 8px 20px rgba(139,92,246,.25)}
+    .cta:hover{filter:brightness(1.1)}
+    .cta:active{transform:translateY(1px)}
+
+    /* Sections */
+    section{max-width:1200px;margin:0 auto;padding:48px 16px}
+    section h2{margin:0 0 18px;color:var(--accent);font-size:clamp(22px,3vw,28px)}
+    .lead{color:#d4d4d4}
+
+    /* About */
+    .about{display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start}
+    .about .bio-pic{background:var(--card);border:1px solid #222;border-radius:14px;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+    .about .bio-pic img{display:block;width:100%;height:100%;object-fit:cover}
+    .about .bio-text{background:var(--card);border:1px solid #222;border-radius:14px;padding:16px;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+
+    /* Galleries */
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    @media (min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
+    @media (min-width:980px){.grid{grid-template-columns:repeat(4,1fr)}}
+
+    .tile{position:relative;background:var(--card);border:1px solid #222;border-radius:12px;overflow:hidden;cursor:zoom-in;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+    .tile img{width:100%;height:240px;object-fit:cover;display:block}
+
+    /* Contact */
+    .contact-card{background:var(--card);border:1px solid #222;border-radius:14px;padding:18px;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+    .contact-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1px solid var(--accent);color:var(--accent);text-decoration:none}
+    .btn:hover{background:rgba(139,92,246,.1)}
+    .btn:active{transform:translateY(1px);opacity:.95}
+
+    /* Footer */
+    footer{border-top:1px solid #1f1f1f;padding:20px 16px;margin-top:26px;color:#9ca3af;text-align:center}
+
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.85);z-index:50}
+    .lightbox.open{display:grid}
+    .lightbox img{max-width:min(92vw,1200px);max-height:86vh;border-radius:12px;border:1px solid #333}
+    .lightbox .close{position:absolute;top:14px;right:14px;background:transparent;border:1px solid #555;color:#ddd;border-radius:10px;padding:8px 10px;cursor:pointer}
+
+    /* Mobil */
+    @media (max-width: 900px){
+      .hero{grid-template-columns:1fr}
+      .hero-card{min-height:300px}
+      .tile img{height:200px}
+      .about{grid-template-columns:1fr;}
+      .menu-btn{display:inline-flex}
+      header .nav{gap:10px}
+      header nav{display:none;flex-direction:column;width:100%}
+      header nav.open{display:flex}
+      header nav a{padding:12px 10px;border:1px solid #1f1f1f;background:#0f0f0f;border-radius:10px}
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip link -->
+  <a href="#anasayfa" class="skip-link">İçeriğe geç</a>
+
+  <!-- Header / Nav -->
+  <header>
+    <div class="nav">
+      <a class="brand" href="#top" aria-label="Ana sayfa">
+        <img src="logo.png" alt="RuaTatto logosu" />
+        <span>RuaTatto</span>
+      </a>
+      <button class="menu-btn" id="menuBtn" aria-controls="mainNav" aria-expanded="false">☰ Menü</button>
+      <nav id="mainNav">
+        <a href="#anasayfa">Anasayfa</a>
+        <a href="#hakkimda">Ben kimim?</a>
+        <a href="#eserlerim">Eserlerim</a>
+        <a href="#small">Small Tattos</a>
+        <a href="#medium">Medium Tattos</a>
+        <a href="#big">Big Tattos</a>
+        <a href="#iletisim">İletişim</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero / Anasayfa -->
+  <a id="anasayfa"></a>
+  <section class="hero">
+    <div class="hero-card">
+      <img id="heroImage" src="big13.jpg" alt="Öne çıkan dövme" fetchpriority="high"
+           onerror="this.onerror=null; this.src='done13.jpg'">
+    </div>
+    <div class="hero-copy">
+      <div class="kicker">RUATATTO</div>
+      <h1>Sanat, teninle buluştuğunda <span class="pill">Blog</span></h1>
+      <p class="lead">
+        Çalışmalarımı incele, beğendiğin tasarımı seç ve WhatsApp üzerinden bana yaz.
+        Sadece randevu ile hizmet veriyorum. Aşağıdan portfolyomu gezebilir, WhatsApp’tan hızlıca iletişime geçebilirsin.
+      </p>
+      <a class="cta" href="#iletisim">İletişim →</a>
+    </div>
+  </section>
+
+  <!-- Ben Kimim? -->
+  <a id="hakkimda"></a>
+  <section>
+    <h2>Ben kimim?</h2>
+    <div class="about">
+      <div class="bio-pic">
+        <img src="bio.JPEG.jpg" alt="RuaTatto" onerror="this.onerror=null; this.src='bio.jpg'">
+      </div>
+      <div class="bio-text">
+        <p>Merhaba, ben <strong>Rua</strong>. Fine line ve black & grey çalışmalara odaklanıyorum; yaptırdığın dövmeyi yıllarca severek taşımanı hedefliyorum.</p>
+        <p>Randevu ve fiyatlandırma için lütfen WhatsApp’tan yaz.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Eserlerim -->
+  <a id="eserlerim"></a>
+  <section>
+    <h2>Eserlerim</h2>
+    <div id="grid-done" class="grid"></div>
+  </section>
+
+  <!-- Small -->
+  <a id="small"></a>
+  <section>
+    <h2>Small Tattos</h2>
+    <div id="grid-min" class="grid"></div>
+  </section>
+
+  <!-- Medium -->
+  <a id="medium"></a>
+  <section>
+    <h2>Medium Tattos</h2>
+    <div id="grid-med" class="grid"></div>
+  </section>
+
+  <!-- Big -->
+  <a id="big"></a>
+  <section>
+    <h2>Big Tattos</h2>
+    <div id="grid-big" class="grid"></div>
+  </section>
+
+  <!-- İletişim -->
+  <a id="iletisim"></a>
+  <section>
+    <h2>İletişim</h2>
+    <div class="contact-card">
+      <p class="lead">Randevu, fiyat ve tasarım için bana WhatsApp veya Instagram üzerinden yazabilirsin.</p>
+      <div class="contact-actions">
+        <a class="btn" href="https://wa.me/905000000000" target="_blank" rel="noopener">WhatsApp’tan Ulaş</a>
+        <a class="btn" href="https://instagram.com/ruatatto" target="_blank" rel="noopener">Instagram’da Takip Et</a>
+        <a class="btn" href="#hakkimda">Hakkımda</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © <span id="year"></span> RuaTatto • Tüm hakları saklıdır.
+  </footer>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Büyük görsel">
+    <button class="close" onclick="closeLightbox()">Kapat ✕</button>
+    <img id="lightboxImg" alt="Büyük görsel" />
+  </div>
+
+  <script>
+    // Yıl
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Mobil menü toggler
+    const menuBtn = document.getElementById('menuBtn');
+    const mainNav = document.getElementById('mainNav');
+    if(menuBtn){
+      menuBtn.addEventListener('click', ()=>{
+        const open = mainNav.classList.toggle('open');
+        menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
+
+    // Lightbox
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightboxImg');
+    function openLightbox(src){ lbImg.src = src; lb.classList.add('open'); }
+    function closeLightbox(){ lb.classList.remove('open'); lbImg.src=''; }
+    lb.addEventListener('click', (e)=>{ if(e.target===lb) closeLightbox(); });
+    window.closeLightbox = closeLightbox;
+
+    // Image güvenliği
+    function safeImage(el){ el.onerror = () => { const tile = el.closest('.tile'); if(tile) tile.remove(); }; }
+
+    // Lazy-load galeri
+    function fillGrid(gridId, prefix, count){
+      const grid = document.getElementById(gridId);
+      for(let i=1;i<=count;i++){
+        const src = `${prefix}${i}.jpg`;
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        const img = document.createElement('img');
+        img.alt = `${prefix}${i}`;
+        img.src = src;
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        safeImage(img);
+        img.addEventListener('click',()=>openLightbox(img.src));
+        tile.appendChild(img);
+        grid.appendChild(tile);
+      }
+    }
+
+ // Dosya var mı hızlıca kontrol (aynı origin olduğumuz için HEAD çalışır)
+async function exists(url){
+  try{
+    const r = await fetch(url, { method: 'HEAD' });
+    return r.ok;
+  }catch(e){ return false; }
+}
+
+// Otomatik keşif: 1'den başlayıp dosyalar bitene kadar ekler
+async function autoFillGrid(gridId, prefix, start=1, max=300){
+  const grid = document.getElementById(gridId);
+  let found = 0;
+  for(let i=start; i<=max; i++){
+    const url = `${prefix}${i}.jpg`;     // .jpg kullanıyoruz (senin düzenine uygun)
+    if(await exists(url)){
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      const img = document.createElement('img');
+      img.alt = `${prefix}${i}`;
+      img.src = url;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.addEventListener('click', ()=>openLightbox(img.src));
+      tile.appendChild(img);
+      grid.appendChild(tile);
+      found++;
+    }else{
+      // En az 1 tane bulduktan sonra ilk boşlukta dur (sonda numara kalmadı demektir)
+      if(found > 0) break;
+      // baştaki eksikleri atlayıp devam etmek istersen else kısmını boş bırakabilirsin
+    }
+  }
+}
+
+// Artık sayı vermiyoruz — kendisi buluyor
+autoFillGrid('grid-done','done');
+autoFillGrid('grid-min','min');
+autoFillGrid('grid-med','med');
+autoFillGrid('grid-big','big');
+
+    // ScrollSpy: görünür bölüme göre menüde aktif vurgusu
+    const sections = [...document.querySelectorAll('section')];
+    const menuLinks = [...document.querySelectorAll('nav a')];
+    const byId = id => menuLinks.find(a => a.getAttribute('href') === `#${id}`);
+    const spy = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          const anchor = e.target.previousElementSibling;
+          const id = anchor && anchor.id ? anchor.id : e.target.getAttribute('id');
+          menuLinks.forEach(a => a.classList.remove('active'));
+          const link = byId(id);
+          if(link){ link.classList.add('active'); }
+        }
+      });
+    },{rootMargin:"-40% 0px -55% 0px", threshold:0.01});
+    sections.forEach(s=>spy.observe(s));
+  </script>
+</body>
+</html>

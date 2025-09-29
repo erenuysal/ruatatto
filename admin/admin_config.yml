@@ -1,0 +1,16 @@
+backend:
+  name: git-gateway
+  branch: main  # GitHub’da ana dalın adı
+media_folder: "static/uploads"   # yüklenen fotoğraflar burada saklanır
+public_folder: "/static/uploads"
+
+collections:
+  - name: "tattoos"
+    label: "Tattoos"
+    folder: "content/tattoos"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Başlık", name: "title", widget: "string" }
+      - { label: "Kategori", name: "category", widget: "select", options: ["small", "medium", "big", "done"] }
+      - { label: "Fotoğraf", name: "image", widget: "image" }
