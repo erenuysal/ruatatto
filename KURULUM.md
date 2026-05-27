@@ -29,7 +29,24 @@ Asagidaki 4 degiskeni ekle:
 
 Kaydettikten sonra: **Deploys → Trigger deploy → Deploy site**
 
-## Adim 3 — Supabase Storage
+## Adim 2b — Build ayari (deploy hatasi aldiysan)
+
+Hata: `Your publish directory cannot be the same as the base directory`
+
+Eski statik site ayari kalmis. Next.js icin publish directory **bos** olmali.
+
+Netlify → ruatatto.com → **Project configuration** → **Build & deploy** → **Build settings** → **Edit settings**
+
+| Alan | Deger |
+|------|-------|
+| Build command | `npm run build` |
+| Publish directory | **BOS BIRAK** (sil, `.` veya `/` yazma) |
+| Base directory | Bos birak |
+
+Kaydet → **Deploys → Trigger deploy → Deploy site**
+
+`@netlify/plugin-nextjs` publish klasorunu otomatik ayarlar; elle yazma.
+
 
 Supabase → Storage → `portfolio` bucket'i public olmali.
 Yoksa Storage'dan olustur ve public yap.
