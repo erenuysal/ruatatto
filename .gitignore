@@ -38,3 +38,6 @@ next-env.d.ts
 
 # netlify
 .netlify
+
+# temp clone
+/_old_repo
