@@ -2,37 +2,55 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 let client: SupabaseClient | null = null;
 
-function getSupabaseUrl() {
-  return process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://placeholder.supabase.co";
+export function getSupabaseUrl() {
+  return process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 }
 
-function getSupabaseAnonKey() {
-  return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "placeholder-anon-key";
+export function getAnonKey() {
+  return (
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    ""
+  );
+}
+
+export function getServiceKey() {
+  return (
+    process.env.SUPABASE_SERVICE_ROLE_KEY ??
+    process.env.SUPABASE_SECRET_KEY ??
+    ""
+  );
 }
 
 export function getSupabase() {
   if (!client) {
-    client = createClient(getSupabaseUrl(), getSupabaseAnonKey());
+    const url = getSupabaseUrl();
+    const key = getAnonKey();
+    if (!url || !key) {
+      throw new Error("Supabase URL veya anon key yapılandırılmamış.");
+    }
+    client = createClient(url, key);
   }
   return client;
 }
 
-export const supabase = getSupabase();
-
 export function createServiceClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceKey) {
-    throw new Error("Supabase service credentials are not configured.");
+  const url = getSupabaseUrl();
+  const key = getServiceKey();
+  if (!url || !key) {
+    throw new Error(
+      "SUPABASE_SERVICE_ROLE_KEY (secret key) Netlify ortam değişkenlerine eklenmeli.",
+    );
   }
-  return createClient(supabaseUrl, serviceKey, {
+  return createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
 
 export function isSupabaseConfigured() {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
+  return Boolean(getSupabaseUrl() && getAnonKey());
+}
+
+export function isServiceConfigured() {
+  return Boolean(getSupabaseUrl() && getServiceKey());
 }

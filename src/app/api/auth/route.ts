@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import {
   COOKIE_NAME,
   createAdminToken,
@@ -37,8 +38,9 @@ export async function DELETE() {
   return response;
 }
 
-export async function GET(request: Request) {
-  const token = request.headers.get("cookie")?.match(/ruatatto_admin=([^;]+)/)?.[1];
+export async function GET() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) {
     return NextResponse.json({ authenticated: false });
   }

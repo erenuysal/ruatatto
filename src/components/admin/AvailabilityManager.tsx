@@ -2,41 +2,54 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { TIME_SLOTS, WEEKDAYS } from "@/lib/constants";
-import { supabase } from "@/lib/supabase";
+import { DEFAULT_WORKING_HOURS } from "@/lib/working-hours";
 import type { BlockedDate, BlockedSlot, WorkingHours } from "@/lib/types";
 
 export function AvailabilityManager() {
-  const [hours, setHours] = useState<WorkingHours[]>([]);
+  const [hours, setHours] = useState<WorkingHours[]>(DEFAULT_WORKING_HOURS);
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
   const [blockedSlots, setBlockedSlots] = useState<BlockedSlot[]>([]);
   const [newBlockDate, setNewBlockDate] = useState("");
   const [newBlockTimeDate, setNewBlockTimeDate] = useState("");
   const [newBlockTime, setNewBlockTime] = useState<string>(TIME_SLOTS[0]);
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const load = useCallback(async () => {
-    const [h, d, s] = await Promise.all([
-      supabase.from("working_hours").select("*").order("day_of_week"),
-      supabase.from("blocked_dates").select("*").order("blocked_date"),
-      supabase.from("blocked_slots").select("*").order("slot_date"),
-    ]);
-    setHours(h.data ?? []);
-    setBlockedDates(d.data ?? []);
-    setBlockedSlots(s.data ?? []);
+    const res = await fetch("/api/availability?settings=1");
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.working_hours?.length) setHours(data.working_hours);
+    setBlockedDates(data.blocked_dates ?? []);
+    setBlockedSlots(data.blocked_slots ?? []);
   }, []);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  async function saveHours() {
+  async function apiCall(body: object) {
     const res = await fetch("/api/availability", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "working_hours", hours }),
+      body: JSON.stringify(body),
     });
-    if (res.ok) setMessage("Çalışma saatleri kaydedildi.");
-    else setMessage("Kaydetme hatası.");
+    const data = await res.json();
+    if (!res.ok) {
+      setIsError(true);
+      setMessage(data.error ?? "Kaydetme hatası.");
+      return false;
+    }
+    setIsError(false);
+    return true;
+  }
+
+  async function saveHours() {
+    const ok = await apiCall({ type: "working_hours", hours });
+    if (ok) {
+      setMessage("Çalışma saatleri kaydedildi.");
+      load();
+    }
   }
 
   function updateHour(day: number, field: keyof WorkingHours, value: string | boolean) {
@@ -50,7 +63,7 @@ export function AvailabilityManager() {
       return [
         ...prev,
         {
-          id: crypto.randomUUID(),
+          id: `temp-${day}`,
           day_of_week: day,
           start_time: "10:00",
           end_time: "19:00",
@@ -63,52 +76,56 @@ export function AvailabilityManager() {
 
   async function addBlockedDate() {
     if (!newBlockDate) return;
-    await fetch("/api/availability", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "blocked_date", date: newBlockDate }),
-    });
-    setNewBlockDate("");
-    load();
+    const ok = await apiCall({ type: "blocked_date", date: newBlockDate });
+    if (ok) {
+      setNewBlockDate("");
+      setMessage("Gün kapatıldı.");
+      load();
+    }
   }
 
   async function addBlockedSlot() {
     if (!newBlockTimeDate) return;
-    await fetch("/api/availability", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "blocked_slot",
-        date: newBlockTimeDate,
-        time: newBlockTime,
-      }),
+    const ok = await apiCall({
+      type: "blocked_slot",
+      date: newBlockTimeDate,
+      time: newBlockTime,
     });
-    setNewBlockTimeDate("");
-    load();
+    if (ok) {
+      setNewBlockTimeDate("");
+      setMessage("Saat kapatıldı.");
+      load();
+    }
   }
 
   async function removeBlockedDate(id: string) {
-    await fetch("/api/availability", {
+    const res = await fetch("/api/availability", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "blocked_date", id }),
     });
-    load();
+    if (res.ok) load();
   }
 
   async function removeBlockedSlot(id: string) {
-    await fetch("/api/availability", {
+    const res = await fetch("/api/availability", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "blocked_slot", id }),
     });
-    load();
+    if (res.ok) load();
   }
 
   return (
     <div className="space-y-5">
       {message && (
-        <p className="rounded-xl bg-green-500/10 p-3 text-sm text-green-400">{message}</p>
+        <p
+          className={`rounded-xl p-3 text-sm ${
+            isError ? "bg-red-500/10 text-red-400" : "bg-green-500/10 text-green-400"
+          }`}
+        >
+          {message}
+        </p>
       )}
 
       <div className="rounded-2xl border border-[#222] bg-[#121212] p-5">

@@ -11,6 +11,7 @@ export function PortfolioManager() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const loadImages = useCallback(async () => {
@@ -29,30 +30,45 @@ export function PortfolioManager() {
     if (!files?.length) return;
     setUploading(true);
     setMessage("");
+    setIsError(false);
 
     let success = 0;
+    let lastError = "";
+
     for (const file of Array.from(files)) {
       const form = new FormData();
       form.append("file", file);
       form.append("category", category);
       const res = await fetch("/api/portfolio", { method: "POST", body: form });
-      if (res.ok) success++;
+      if (res.ok) {
+        success++;
+      } else {
+        const data = await res.json();
+        lastError = data.error ?? "Yükleme başarısız.";
+      }
     }
 
-    setMessage(`${success} görsel yüklendi.`);
     setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
-    loadImages();
+
+    if (success > 0) {
+      setIsError(false);
+      setMessage(`${success} görsel yüklendi.`);
+      loadImages();
+    } else {
+      setIsError(true);
+      setMessage(lastError || "Görsel yüklenemedi.");
+    }
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Bu görseli silmek istediğine emin misin?")) return;
-    await fetch("/api/portfolio", {
+    const res = await fetch("/api/portfolio", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     });
-    loadImages();
+    if (res.ok) loadImages();
   }
 
   return (
@@ -99,7 +115,11 @@ export function PortfolioManager() {
         </div>
 
         {message && (
-          <p className="mt-3 rounded-xl bg-green-500/10 p-3 text-sm text-green-400">
+          <p
+            className={`mt-3 rounded-xl p-3 text-sm ${
+              isError ? "bg-red-500/10 text-red-400" : "bg-green-500/10 text-green-400"
+            }`}
+          >
             {message}
           </p>
         )}

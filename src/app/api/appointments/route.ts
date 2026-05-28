@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
-import { createServiceClient, supabase } from "@/lib/supabase";
+import { createServiceClient, getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status");
 
-  let query = supabase
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json([]);
+  }
+
+  let query = getSupabase()
     .from("appointments")
     .select("*")
     .order("appointment_date", { ascending: true })
@@ -26,6 +30,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json({ error: "Randevu sistemi yapılandırılmamış." }, { status: 503 });
+  }
+
   const body = await request.json();
   const { date, time, name, phone, email, message } = body;
 
@@ -35,6 +43,8 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  const supabase = getSupabase();
 
   const { data: existing } = await supabase
     .from("appointments")
@@ -77,12 +87,19 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
   }
 
+  let admin;
+  try {
+    admin = createServiceClient();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Supabase bağlantı hatası.";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+
   const { id, status } = await request.json();
   if (!id || !status) {
     return NextResponse.json({ error: "ID ve durum gerekli." }, { status: 400 });
   }
 
-  const admin = createServiceClient();
   const { data, error } = await admin
     .from("appointments")
     .update({ status })
@@ -102,8 +119,15 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
   }
 
+  let admin;
+  try {
+    admin = createServiceClient();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Supabase bağlantı hatası.";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+
   const { id } = await request.json();
-  const admin = createServiceClient();
   const { error } = await admin.from("appointments").delete().eq("id", id);
 
   if (error) {

@@ -1,7 +1,21 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Suspense } from "react";
 import { SITE } from "@/lib/constants";
-import { Gallery } from "@/components/Gallery";
+import { GallerySection } from "@/components/GallerySection";
+
+function GallerySkeleton({ title }: { title: string }) {
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-16">
+      <h2 className="mb-6 text-2xl font-bold text-accent md:text-3xl">{title}</h2>
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="aspect-[3/4] animate-pulse rounded-xl bg-[#121212]" />
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export default function HomePage() {
   return (
@@ -80,34 +94,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      <Gallery
-        id="eserlerim"
-        category="done"
-        title="Eserlerim"
-        fallbackPrefix="/images/Dones/done"
-        fallbackCount={30}
-      />
-      <Gallery
-        id="small"
-        category="small"
-        title="Small Tattoos"
-        fallbackPrefix="/images/Minimals/min"
-        fallbackCount={30}
-      />
-      <Gallery
-        id="medium"
-        category="medium"
-        title="Medium Tattoos"
-        fallbackPrefix="/images/Mediums/med"
-        fallbackCount={30}
-      />
-      <Gallery
-        id="big"
-        category="big"
-        title="Big Tattoos"
-        fallbackPrefix="/images/Bigs/big"
-        fallbackCount={30}
-      />
+      <Suspense fallback={<GallerySkeleton title="Eserlerim" />}>
+        <GallerySection id="eserlerim" category="done" title="Eserlerim" />
+      </Suspense>
+      <Suspense fallback={<GallerySkeleton title="Small Tattoos" />}>
+        <GallerySection id="small" category="small" title="Small Tattoos" />
+      </Suspense>
+      <Suspense fallback={<GallerySkeleton title="Medium Tattoos" />}>
+        <GallerySection id="medium" category="medium" title="Medium Tattoos" />
+      </Suspense>
+      <Suspense fallback={<GallerySkeleton title="Big Tattoos" />}>
+        <GallerySection id="big" category="big" title="Big Tattoos" />
+      </Suspense>
 
       <section id="iletisim" className="mx-auto max-w-6xl px-4 py-16">
         <h2 className="mb-6 text-2xl font-bold text-accent md:text-3xl">İletişim</h2>
