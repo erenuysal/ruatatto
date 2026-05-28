@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { SITE } from "@/lib/constants";
+import type { BrandingSettings } from "@/lib/site-settings";
 
 const NAV = [
   { href: "/#anasayfa", label: "Anasayfa" },
@@ -16,7 +17,7 @@ const NAV = [
   { href: "/#iletisim", label: "İletişim" },
 ];
 
-export function Header() {
+export function Header({ branding }: { branding: BrandingSettings }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const isHome = pathname === "/";
@@ -25,10 +26,15 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-[#1f1f1f] bg-[#0a0a0a]/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
         <Link href="/" className="flex items-center gap-3 font-bold tracking-wide">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15 text-accent">
-            R
-          </span>
-          <span>{SITE.name}</span>
+          <Image
+            src={branding.logoUrl}
+            alt={branding.name}
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-xl object-contain"
+            priority
+          />
+          <span>{branding.name}</span>
         </Link>
 
         <button
@@ -48,7 +54,7 @@ export function Header() {
           {NAV.map((item) => (
             <Link
               key={item.href}
-              href={isHome || item.href.startsWith("/#") ? item.href : `/${item.href}`}
+              href={isHome || item.href.startsWith("/#") ? item.href : item.href}
               className={`rounded-full px-3 py-2 text-sm transition hover:text-accent ${
                 pathname === item.href ? "text-accent" : "text-white"
               }`}

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CATEGORIES, type CategoryId } from "@/lib/constants";
+import { STATIC_GALLERY } from "@/lib/gallery-data";
 import type { PortfolioImage } from "@/lib/types";
 
 export function PortfolioManager() {
@@ -133,7 +134,17 @@ export function PortfolioManager() {
         {loading ? (
           <p className="text-muted">Yükleniyor...</p>
         ) : images.length === 0 ? (
-          <p className="text-muted">Bu kategoride henüz görsel yok.</p>
+          <div>
+            <p className="text-muted">Supabase&apos;de bu kategoride görsel yok.</p>
+            <p className="mt-3 text-sm text-muted">Sitede görünen statik görseller ({STATIC_GALLERY[category].length} adet):</p>
+            <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {STATIC_GALLERY[category].map((src) => (
+                <div key={src} className="relative aspect-[3/4] overflow-hidden rounded-lg border border-[#333] opacity-70">
+                  <Image src={src} alt="" fill className="object-cover" sizes="120px" />
+                </div>
+              ))}
+            </div>
+          </div>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {images.map((img) => (

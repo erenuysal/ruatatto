@@ -1,5 +1,19 @@
 -- Eksik tablolar veya politikalar varsa calistir (Supabase SQL Editor)
 
+-- Site ayarlari (CMS)
+create table if not exists site_settings (
+  key text primary key,
+  value jsonb not null default '{}',
+  updated_at timestamptz not null default now()
+);
+
+insert into site_settings (key, value) values ('main', '{}')
+on conflict (key) do nothing;
+
+alter table site_settings enable row level security;
+drop policy if exists "Public read site_settings" on site_settings;
+create policy "Public read site_settings" on site_settings for select using (true);
+
 -- Tablolar yoksa olustur
 create table if not exists portfolio_images (
   id uuid primary key default gen_random_uuid(),

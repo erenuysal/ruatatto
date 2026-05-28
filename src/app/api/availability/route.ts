@@ -98,7 +98,12 @@ export async function PUT(request: Request) {
     const { error } = await admin
       .from("working_hours")
       .upsert(hours, { onConflict: "day_of_week" });
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      return NextResponse.json(
+        { error: `${error.message} — Supabase SQL fix-policies.sql çalıştırıldı mı?` },
+        { status: 500 },
+      );
+    }
     return NextResponse.json({ success: true });
   }
 
