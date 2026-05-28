@@ -1,5 +1,10 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import { getAnonKey, getServiceKey, getSupabaseUrl } from "./env";
+import {
+  explainFetchError,
+  getAnonKey,
+  getServiceKey,
+  getSupabaseUrl,
+} from "./env";
 
 let client: SupabaseClient | null = null;
 
@@ -43,18 +48,57 @@ export function isServiceConfigured() {
   return Boolean(getSupabaseUrl() && getServiceKey());
 }
 
+async function pingSupabase(key: string) {
+  const url = getSupabaseUrl();
+  const res = await fetchWithTimeout(`${url}/rest/v1/`, {
+    headers: { apikey: key, Authorization: `Bearer ${key}` },
+  });
+
+  if (res.status === 503 || res.status === 502) {
+    return {
+      ok: false as const,
+      error:
+        "Supabase projesi DURAKLATILMIŞ (503). supabase.com → projen → Restore project.",
+    };
+  }
+
+  if (!res.ok && res.status !== 401 && res.status !== 404) {
+    return {
+      ok: false as const,
+      error: `Supabase HTTP ${res.status}. URL ve key'leri kontrol et.`,
+    };
+  }
+
+  return { ok: true as const };
+}
+
 export async function testSupabaseConnection(useService = false) {
+  const key = useService ? getServiceKey() : getAnonKey();
+  if (!getSupabaseUrl() || !key) {
+    return { ok: false, error: "URL veya API key eksik." };
+  }
+
   try {
+    const ping = await pingSupabase(key);
+    if (!ping.ok) return ping;
+
     const db = useService ? createServiceClient() : getSupabase();
     const { error } = await db.from("working_hours").select("id").limit(1);
-    if (error) return { ok: false, error: error.message };
+    if (error) {
+      if (error.message.includes("does not exist") || error.code === "42P01") {
+        return {
+          ok: false,
+          error: "working_hours tablosu yok. fix-policies.sql dosyasını çalıştır.",
+        };
+      }
+      return { ok: false, error: error.message };
+    }
     return { ok: true };
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Bağlantı hatası";
-    return { ok: false, error: message };
+    const raw = err instanceof Error ? err.message : "Bağlantı hatası";
+    return { ok: false, error: explainFetchError(raw) };
   }
 }
 
-// Re-export env helpers
 export { getSupabaseUrl, getAnonKey, getServiceKey } from "./env";
-export { describeSupabaseConfig } from "./env";
+export { describeSupabaseConfig, explainFetchError } from "./env";

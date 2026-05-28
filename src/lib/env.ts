@@ -1,5 +1,5 @@
-function trimEnv(value: string | undefined) {
-  return value?.trim() ?? "";
+export function trimEnv(value: string | undefined) {
+  return value?.trim().replace(/^["']|["']$/g, "") ?? "";
 }
 
 export function getSupabaseUrl() {
@@ -24,10 +24,24 @@ export function describeSupabaseConfig() {
   const anon = getAnonKey();
   const service = getServiceKey();
   return {
-    url: url ? `${url.slice(0, 30)}...` : "EKSIK",
-    anonKey: anon ? `${anon.slice(0, 12)}...` : "EKSIK",
-    serviceKey: service ? `${service.slice(0, 12)}...` : "EKSIK",
+    url: url || "EKSIK",
+    anonKey: anon ? `${anon.slice(0, 16)}...` : "EKSIK",
+    serviceKey: service ? `${service.slice(0, 16)}...` : "EKSIK",
     ready: Boolean(url && anon),
     adminReady: Boolean(url && service),
   };
+}
+
+export function explainFetchError(message: string) {
+  const lower = message.toLowerCase();
+  if (lower.includes("fetch failed") || lower.includes("econnrefused") || lower.includes("enotfound")) {
+    return "Supabase'e bağlanılamıyor. Proje muhtemelen DURAKLATILMIŞ — Supabase Dashboard → Restore project yap.";
+  }
+  if (lower.includes("abort")) {
+    return "Bağlantı zaman aşımına uğradı. Supabase projesini kontrol et.";
+  }
+  if (lower.includes("invalid api key") || lower.includes("jwt")) {
+    return "API key hatalı. Netlify env değişkenlerindeki key'leri Supabase'den yeniden kopyala.";
+  }
+  return message;
 }
