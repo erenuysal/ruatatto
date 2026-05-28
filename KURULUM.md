@@ -40,12 +40,12 @@ Netlify → ruatatto.com → **Project configuration** → **Build & deploy** �
 | Alan | Deger |
 |------|-------|
 | Build command | `npm run build` |
-| Publish directory | **BOS BIRAK** (sil, `.` veya `/` yazma) |
+| Publish directory | `.next` |
 | Base directory | Bos birak |
 
-Kaydet → **Deploys → Trigger deploy → Deploy site**
+**Onemli:** Publish directory bos birakilinca Netlify bazen proje kokunu (`.`) kullanir ve hata verir.
+Bu yuzden `.next` yaz.
 
-`@netlify/plugin-nextjs` publish klasorunu otomatik ayarlar; elle yazma.
 
 Deploy yine kirmizi olursa: **Deploys → Deploy settings → Clear cache and deploy site**
 
