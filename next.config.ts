@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  outputFileTracingExcludes: {
+    "*": ["node_modules/@swc/**", "node_modules/webpack/**"],
+  },
 };
 
 export default nextConfig;

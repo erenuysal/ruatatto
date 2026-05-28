@@ -39,5 +39,6 @@ next-env.d.ts
 # netlify
 .netlify
 
-# temp clone
+# temp clone / eski indirmeler
 /_old_repo
+/ruatatto-main

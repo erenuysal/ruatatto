@@ -47,6 +47,8 @@ Kaydet → **Deploys → Trigger deploy → Deploy site**
 
 `@netlify/plugin-nextjs` publish klasorunu otomatik ayarlar; elle yazma.
 
+Deploy yine kirmizi olursa: **Deploys → Deploy settings → Clear cache and deploy site**
+
 
 Supabase → Storage → `portfolio` bucket'i public olmali.
 Yoksa Storage'dan olustur ve public yap.
